@@ -20,24 +20,24 @@ def tearDown(self):
     connect.close()
 
 def test_regist():
-    cursor.execute('insert into users(user_id, mail_address,password)values(1, "hoge@caraquri", 123)')
-    ok_(regist(connect, 1, data0))
+    cursor.execute('insert into users(user_id, mail_address,password)values(0, "hoge@caraquri", 123)')
+    eq_( register(connect, 1, data0), 0)
 
 def test_update():
-    ok_(update(connect, 1, data))
+    eq_(update(connect, 0, data), 0)
     
 
 def test_get():
     for i in range(0, 10):
-        regist(connect, 1, data1[i])
+        register(connect, 1, data1[i])
     data1.insert(0, data)
     ans = tuple(data1)
-    result = get(connect, "1-10")
+    result = get(connect, "0-1")
     eq_(result[0]['name'], data['name'])
     eq_(result[0]['purchase_date'], dt.strptime(data['purchase_date'], '%Y-%m-%d'))
     eq_(result[0]['image_url'], data['image_url'])
     eq_(result[0]['price'], Decimal(data['price']))
-    result = get(connect, "2-11")
+    result = get(connect, "1-10")
     eq_(result[0]['name'], data1[1]['name'])
     eq_(result[0]['purchase_date'], dt.strptime(data1[1]['purchase_date'], '%Y-%m-%d'))
     eq_(result[0]['image_url'], data1[1]['image_url'])

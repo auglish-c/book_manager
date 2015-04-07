@@ -16,9 +16,9 @@ def tearDown(self):
     connect.close()
 
 def test_sign_up():
-    cursor.execute('insert into users(user_id, mail_address,password)values(1, "hoge@caraquri", 123)')
-    signup( connect, 'hoge@hoge', '2333' )
+    cursor.execute('insert into users(user_id, mail_address,password)values(0, "hoge@caraquri", 123)')
+    register( connect, 'hoge@hoge', '2333' )
     cursor.execute('select * from users')
-    ans = ({'mail_address': 'hoge@caraquri', 'password': '123', 'user_id': 1L}, 
-           {'mail_address': 'hoge@hoge', 'password': '2333', 'user_id': 2L})
+    ans = ({'mail_address': 'hoge@caraquri', 'password': '123', 'user_id': 0L}, 
+           {'mail_address': 'hoge@hoge', 'password': '2333', 'user_id': 1L})
     eq_(cursor.fetchall(), ans)

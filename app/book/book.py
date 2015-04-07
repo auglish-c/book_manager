@@ -11,11 +11,14 @@ def connect_db():
     connect.cursortall = MySQLdb.cursors.DictCursor
     return connect
 
-def regist(db, user_id, data):
-    cursor = db.cursor()
+def register(db, user_id, data):
+    cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from books')
     id_count = cursor.fetchone()
-    new_id = int(id_count['count("id")']) + 1
+    if id_count['count("id")'] == 0l:
+        new_id = 0
+    else:
+        new_id = int(id_count['count("id")'])
     today = date.today()
     sql = 'insert into books(\
               id,\
@@ -31,8 +34,8 @@ def regist(db, user_id, data):
     db.commit()
     return new_id
     
-def update(db, book_id,data):
-    cur = db.cursor()
+def update(db, book_id, data):
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
     sql = 'update books set name = "%s",\
                             price = "%s",\
                             purchase_date = "%s",\
@@ -41,16 +44,16 @@ def update(db, book_id,data):
           (data['name'], data['price'], data['purchase_date'],
            data['image_url'], book_id)
     cur.execute(sql)
+    db.commit()
     return book_id
 
 def get(db, page):
-    cur = db.cursor()
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
     pages = page.split('-')
+    pages[1] = str(int(pages[0]) + int(pages[1]) - 1)
     sql = 'select id, image_url, name, price, purchase_date \
            from books\
            where id between %s and  %s' %\
            (pages[0], pages[1])
     cur.execute(sql)
     return cur.fetchall()
-    #pprint.pprint( cur.fetchall())
-
