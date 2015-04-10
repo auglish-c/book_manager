@@ -7,7 +7,7 @@ db = users.connect_db()
 
 @app.route('/')
 def hello():
-    return "Hello world"
+    return "hello world"
 
 @app.route('/account/register', methods = ['POST'])
 def register():
@@ -21,9 +21,9 @@ def login():
 
 @app.route('/book/regist', methods = ['POST'])
 def regist():
-    data = { 'image_url': request.form['image_url'],
-             'name': request.form['name'],
-             'price': request.form['price'],
+    data = { 'image_url'    : request.form['image_url'],
+             'name'         : request.form['name'],
+             'price'        : request.form['price'],
              'purchase_date': request.form['purchase_date']}
     res = book.register(db, 1, data)
     return str(res)
@@ -43,4 +43,4 @@ def get():
     return jsonify(result=res)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
