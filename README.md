@@ -45,7 +45,7 @@
 以下のコマンドを実行
 
 ```
-$ vagrant box add bookmanager bookmanager.box 
+$ vagrant box add book_manager package.box 
 $ vagrant up
 ```
 
