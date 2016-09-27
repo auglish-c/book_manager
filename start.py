@@ -11,8 +11,8 @@ def hello():
 
 @app.route('/account/register', methods = ['POST'])
 def register():
-    users.register(db, request.form['mail_address'], request.form['password'])
-    return 'ok'
+    res = users.register(db, request.form['mail_address'], request.form['password'])
+    return res
 
 @app.route('/account/login', methods = ['POST'])
 def login():
