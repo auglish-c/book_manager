@@ -11,7 +11,7 @@ def connect_db():
     connect.cursortall = MySQLdb.cursors.DictCursor
     return connect
 
-def register(db, user_id, data):
+def register(db, data):
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from books')
     id_count = cursor.fetchone()
@@ -28,7 +28,7 @@ def register(db, user_id, data):
               purchase_date,\
               image_url\
            )values(%d, %d, "%s", "%s", "%s", "%s")'\
-           % (new_id, user_id, data['name'], data['price'],
+           % (new_id, data['user_id'], data['name'], data['price'],
               data['purchase_date'], data['image_url'])
     cursor.execute(sql)
     db.commit()
@@ -47,13 +47,13 @@ def update(db, book_id, data):
     db.commit()
     return book_id
 
-def get(db, page):
+def get(db, page, user_id):
     cur = db.cursor(MySQLdb.cursors.DictCursor)
     pages = page.split('-')
     pages[1] = str(int(pages[0]) + int(pages[1]) - 1)
     sql = 'select id, image_url, name, price, purchase_date \
            from books\
-           where id between %s and  %s' %\
-           (pages[0], pages[1])
+           where user_id = %s and id between %s and  %s' %\
+           (user_id, pages[0], pages[1])
     cur.execute(sql)
     return cur.fetchall()
