@@ -22,7 +22,7 @@ def login():
 @app.route('/book/regist', methods = ['POST'])
 def regist():
     data = { 'user_id'      : request.form['user_id'],
-             'image_url'    : request.form['image_url'],
+             'image_data'    : request.form['image_data'],
              'name'         : request.form['name'],
              'price'        : request.form['price'],
              'purchase_date': request.form['purchase_date']}
@@ -31,7 +31,7 @@ def regist():
 
 @app.route('/book/update', methods = ['POST'])
 def update():
-    data = { 'image_url': request.form['image_url'],
+    data = { 'image_data': request.form['image_data'],
              'name': request.form['name'],
              'price': request.form['price'],
              'purchase_date': request.form['purchase_date']}
