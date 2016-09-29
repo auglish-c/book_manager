@@ -21,11 +21,12 @@ def login():
 
 @app.route('/book/regist', methods = ['POST'])
 def regist():
-    data = { 'image_url'    : request.form['image_url'],
+    data = { 'user_id'      : request.form['user_id'],
+             'image_url'    : request.form['image_url'],
              'name'         : request.form['name'],
              'price'        : request.form['price'],
              'purchase_date': request.form['purchase_date']}
-    res = book.register(db, 1, data)
+    res = book.register(db, data)
     return str(res)
 
 @app.route('/book/update', methods = ['POST'])
@@ -39,7 +40,7 @@ def update():
 
 @app.route('/book/get', methods = ['POST'])
 def get():
-    res = book.get(db, request.form['page'])
+    res = book.get(db, request.form['page'], request.form['user_id'])
     return jsonify(result=res)
 
 if __name__ == '__main__':
