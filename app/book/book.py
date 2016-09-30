@@ -64,7 +64,7 @@ def get(db, page, user_id):
 
 def image_upload(img_data):
     value = {'image' : img_data}
-    url = "http://api.imgur.com/3/image"
+    url = "https://api.imgur.com/3/image"
     header = {'Authorization' : 'Client-ID 195c2aaa51fa976'}
 
     data = urllib.urlencode(value)
