@@ -25,8 +25,11 @@ def register(db, data):
     else:
         new_id = int(id_count['count("id")'])
     today = date.today()
-    image_url = image_upload(data['image_data'])
-    print image_url
+
+    image_url = ''
+    if data['image_data'] != '':
+        image_url = image_upload(data['image_data'])
+
     sql = 'insert into books(\
               id,\
               user_id,\
@@ -42,7 +45,10 @@ def register(db, data):
     return new_id
 
 def update(db, book_id, data):
-    image_url = image_upload(data['image_data'])
+    image_url = ""
+    if data['image_data'] != '':
+        image_url = image_upload(data['image_data'])
+
     cur = db.cursor(MySQLdb.cursors.DictCursor)
     sql = 'update books set name = "%s",\
                             price = "%s",\
