@@ -43,10 +43,10 @@ def update():
     res = book.update(db, request.form['id'], data)
     return str(res)
 
-@app.route('/book/get', methods = ['POST'])
+@app.route('/book/get', methods = ['GET'])
 def get():
     print request.values
-    res = book.get(db, request.form['page'], request.form['user_id'])
+    res = book.get(db, request.args.get('page'), request.args.get('user_id'))
     return jsonify(result=res)
 
 if __name__ == '__main__':
