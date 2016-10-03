@@ -11,18 +11,22 @@ def hello():
 
 @app.route('/account/register', methods = ['POST'])
 def register():
+    print request.values
     res = users.register(db, request.form['mail_address'], request.form['password'])
-    return res
+    print res
+    return str(res)
 
 @app.route('/account/login', methods = ['POST'])
 def login():
+    print request.values
     res = users.login(db, request.form['mail_address'], request.form['password'])
     return str(res)
 
 @app.route('/book/regist', methods = ['POST'])
 def regist():
+    print request.values
     data = { 'user_id'      : request.form['user_id'],
-             'image_url'    : request.form['image_url'],
+             'image_data'    : request.form['image_data'],
              'name'         : request.form['name'],
              'price'        : request.form['price'],
              'purchase_date': request.form['purchase_date']}
@@ -31,7 +35,8 @@ def regist():
 
 @app.route('/book/update', methods = ['POST'])
 def update():
-    data = { 'image_url': request.form['image_url'],
+    print request.values
+    data = { 'image_data': request.form['image_data'],
              'name': request.form['name'],
              'price': request.form['price'],
              'purchase_date': request.form['purchase_date']}
@@ -40,6 +45,7 @@ def update():
 
 @app.route('/book/get', methods = ['POST'])
 def get():
+    print request.values
     res = book.get(db, request.form['page'], request.form['user_id'])
     return jsonify(result=res)
 
