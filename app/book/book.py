@@ -4,6 +4,8 @@ import pprint
 import json
 import urllib
 import urllib2
+import sys
+import base64
 
 def connect_db():
     connect = MySQLdb.connect(host = 'localhost',
@@ -14,6 +16,7 @@ def connect_db():
     return connect
 
 def register(db, data):
+    print(sys.stdout.encoding)
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from books')
     id_count = cursor.fetchone()
@@ -23,6 +26,7 @@ def register(db, data):
         new_id = int(id_count['count("id")'])
     today = date.today()
     image_url = image_upload(data['image_data'])
+    print image_url
     sql = 'insert into books(\
               id,\
               user_id,\
@@ -30,7 +34,7 @@ def register(db, data):
               price,\
               purchase_date,\
               image_url\
-           )values(%d, %d, "%s", "%s", "%s", "%s")'\
+           )values(%d, "%s", "%s", "%s", "%s", "%s")'\
            % (new_id, data['user_id'], data['name'], data['price'],
               data['purchase_date'], image_url)
     cursor.execute(sql)
@@ -63,12 +67,13 @@ def get(db, page, user_id):
     return cur.fetchall()
 
 def image_upload(img_data):
-    value = {'image' : img_data}
+    value = {'image' : base64.b64decode(img_data) }
     url = "https://api.imgur.com/3/image"
     header = {'Authorization' : 'Client-ID 195c2aaa51fa976'}
 
     data = urllib.urlencode(value)
-    req = urllib2.Request(url, data, url)
+    req = urllib2.Request(url, data, header)
     res = urllib2.urlopen(req)
-    resJson = json.load(res.road())
+    resStr = res.read()
+    resJson = json.loads(resStr)
     return resJson['data']['link']
