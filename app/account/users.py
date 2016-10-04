@@ -9,6 +9,13 @@ def connect_db():
     return connect
 
 def register(db, mail, pswd):
+    if mail is '' or pswd is '':
+        print 'bad request'
+        return 0
+    if getPasswordByMailAddress(db, mail) is not None:
+        print 'registered'
+        return 2
+
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from users')
     id_count = cursor.fetchone()
@@ -26,13 +33,17 @@ def register(db, mail, pswd):
     return 1
 
 def login(db, mail, pswd):
+    ps = getPasswordByMailAddress(db, mail)
+    print ps
+    if ps['password'] == pswd:
+        return 1
+    else:
+        return 0
+
+def getPasswordByMailAddress(db, mail):
     cur = db.cursor(MySQLdb.cursors.DictCursor)
     sql = 'select password from users \
            where mail_address = "%s"'\
            % mail
     cur.execute(sql)
-    ps = cur.fetchone()
-    if ps['password'] == pswd:
-        return 1
-    else:
-        return 0
+    return cur.fetchone()
