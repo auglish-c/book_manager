@@ -1,9 +1,15 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from app.account import users
 from app.book import book
+from flask.ext.login import LoginManager, UserMixin, login_required,\
+                           login_user, logout_user, make_secure_token
 
 app = Flask(__name__)
 db = users.connect_db()
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 @app.route('/')
 def hello():
@@ -16,10 +22,18 @@ def register():
     print res
     return str(res)
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
 @app.route('/account/login', methods = ['POST'])
 def login():
     print request.values
     res = users.login(db, request.form['mail_address'], request.form['password'])
+    if res:
+        user = User(res['mail_address'], res['password'])
+        session['username'] = res['id']
+        print session
     return str(res)
 
 @app.route('/book/regist', methods = ['POST'])
@@ -49,5 +63,25 @@ def get():
     res = book.get(db, request.args.get('page'), request.args.get('user_id'))
     return jsonify(result=res)
 
+class User(UserMixin):
+    def __init__(self, id, passwd):
+        self.id = id
+        self.name = "user" + str(id)
+        self.password = passwd
+
+@login_manager.user_loader
+def user_loader(email):
+   user = User()
+   user.id = email
+   print user.id
+   return user
+
+@login_manager.request_loader
+def request_loader(request):
+   user = User()
+   user.id = request.form['mail_address']
+   print user.id
+   return user
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

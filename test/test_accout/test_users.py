@@ -28,10 +28,9 @@ def test_sign_up():
     res = register(connect, 'hoge@hoge', '')
     eq_(res, 0)
 
-def test_get_Password_by_mail_address():
-    userInfo = getPasswordByMailAddress(connect, "hoge@caraquri")
-    ans = ({'password': '123'})
+def test_get_User_by_mail_address():
+    userInfo = getUserByMailAddress(connect, "hoge@caraquri")
+    ans = ({'mail_address': 'hoge@caraquri', 'password': '123', 'user_id': 0L}) 
     eq_(userInfo, ans)
-    userInfo = getPasswordByMailAddress(connect, "hog@caraquri")
+    userInfo = getUserByMailAddress(connect, "hog@caraquri")
     eq_(userInfo, None)
-

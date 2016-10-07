@@ -1,4 +1,6 @@
 import MySQLdb
+from itsdangerous import (TimedJSONWebSignatureSerializer 
+        as Serializer, BadSignature, SignatureExpired)
 
 def connect_db():
     connect = MySQLdb.connect(host   = 'localhost',
@@ -12,7 +14,7 @@ def register(db, mail, pswd):
     if mail is '' or pswd is '':
         print 'bad request'
         return 0
-    if getPasswordByMailAddress(db, mail) is not None:
+    if getUserByMailAddress(db, mail) is not None:
         print 'registered'
         return 2
 
@@ -33,16 +35,16 @@ def register(db, mail, pswd):
     return 1
 
 def login(db, mail, pswd):
-    ps = getPasswordByMailAddress(db, mail)
+    ps = getUserByMailAddress(db, mail)
     print ps
     if ps['password'] == pswd:
-        return 1
+        return ps
     else:
         return 0
 
-def getPasswordByMailAddress(db, mail):
+def getUserByMailAddress(db, mail):
     cur = db.cursor(MySQLdb.cursors.DictCursor)
-    sql = 'select password from users \
+    sql = 'select * from users \
            where mail_address = "%s"'\
            % mail
     cur.execute(sql)
