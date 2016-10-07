@@ -7,6 +7,11 @@ from flask.ext.login import LoginManager, UserMixin, login_required,\
 app = Flask(__name__)
 db = users.connect_db()
 
+app.config.update(
+    DEBUG = True,
+    SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN'
+)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -32,7 +37,7 @@ def login():
     res = users.login(db, request.form['mail_address'], request.form['password'])
     if res:
         user = User(res['mail_address'], res['password'])
-        session['username'] = res['id']
+        session['username'] = res['user_id']
         print session
     return str(res)
 

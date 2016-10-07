@@ -37,7 +37,7 @@ def register(db, mail, pswd):
 def login(db, mail, pswd):
     ps = getUserByMailAddress(db, mail)
     print ps
-    if ps['password'] == pswd:
+    if ps is not None and ps['password'] == pswd:
         return ps
     else:
         return 0
