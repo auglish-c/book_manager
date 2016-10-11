@@ -3,6 +3,7 @@ from app.account import users
 from app.book import book
 from flask.ext.login import LoginManager, UserMixin, login_required,\
                            login_user, logout_user, make_secure_token
+import base64
 
 app = Flask(__name__)
 db = users.connect_db()
@@ -37,9 +38,17 @@ def login():
     res = users.login(db, request.form['mail_address'], request.form['password'])
     if res:
         user = User(res['mail_address'], res['password'])
-        session['username'] = res['user_id']
-        print session
-    return str(res)
+        login_user(user)
+        print session['user_id']
+    return base64.b64decode(make_secure_token())
+
+@app.route("/account/logout")
+@login_required
+def logout():
+    try:
+        return str(logout_user())
+    except ValueError:
+        return "False"
 
 @app.route('/book/regist', methods = ['POST'])
 def regist():
@@ -76,17 +85,13 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def user_loader(email):
-   user = User()
-   user.id = email
-   print user.id
-   return user
+    user = User(email, email)
+    return user
 
 @login_manager.request_loader
 def request_loader(request):
-   user = User()
-   user.id = request.form['mail_address']
-   print user.id
-   return user
+    user = User(request.form['mail_address'], request.form['password'])
+    return user
 
 if __name__ == '__main__':
     app.run(debug=True)
