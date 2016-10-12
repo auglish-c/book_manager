@@ -24,13 +24,15 @@ def hello():
 @app.route('/signup', methods = ['POST'])
 def register():
     print request.values
+    mail_address = request.json['mail_address']
+    passwd = request.json['password']
     res = users.register(db, request.json['mail_address'], request.json['password'])
     if res == users.REGISTERING:
-        user = User(res['mail_address'], res['password'])
+        user = User(mail_address, passwd)
         login_user(user)
         print session['user_id']
-        return make_secure_token(session['user_id'])
-    return str(res)
+        return jsonify(request_token=make_secure_token(session['user_id']))
+    return jsonify(error=res)
 
 @app.route('/login', methods = ['POST'])
 def login():
@@ -39,14 +41,14 @@ def login():
     if res == users.SUCCESS:
         user = User(json['mail_address'], json['password'])
         login_user(user)
-        return make_secure_token(session['user_id'])
-    return str(0)
+        return jsonify(request_token=make_secure_token(session['user_id']))
+    return jsonify(error=0)
 
 @app.route("/logout")
 @login_required
 def logout():
     check_auth(request)
-    return str(logout_user())
+    return jsonify(is_success=logout_user())
 
 @app.route('/books', methods = ['POST'])
 def regist():
@@ -58,9 +60,9 @@ def regist():
              'price'        : request.json['price'],
              'purchase_date': request.json['purchase_date']}
     res = book.register(db, data)
-    return str(res)
+    return jsonify(book_id=res)
 
-@app.route('/books/<id>', methods = ['POST'])
+@app.route('/books/<id>', methods = ['PATCH'])
 def update(id):
     check_auth(request)
     print request.values
@@ -69,7 +71,7 @@ def update(id):
              'price': request.json['price'],
              'purchase_date': request.json['purchase_date']}
     res = book.update(db, id, data)
-    return str(res)
+    return jsonify(book_id=res)
 
 @app.route('/books', methods = ['GET'])
 def get():
@@ -98,6 +100,7 @@ def request_loader(request):
 
 def check_auth(request):
     print request.headers
+    print session
     if 'Authorization' not in request.headers:
         abort(401)
     if 'user_id' not in session:
@@ -105,6 +108,7 @@ def check_auth(request):
 
     header_token = request.headers['Authorization']
     token = make_secure_token(session['user_id'])
+    print token
     if header_token != token:
         abort(401)
     return True
