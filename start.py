@@ -24,7 +24,7 @@ def hello():
 @app.route('/signup', methods = ['POST'])
 def register():
     print request.values
-    res = users.register(db, request.form['mail_address'], request.form['password'])
+    res = users.register(db, request.json['mail_address'], request.json['password'])
     if res == users.REGISTERING:
         user = User(res['mail_address'], res['password'])
         login_user(user)
@@ -34,10 +34,10 @@ def register():
 
 @app.route('/login', methods = ['POST'])
 def login():
-    print request.values
-    res = users.login(db, request.form['mail_address'], request.form['password'])
+    json = request.json
+    res = users.login(db, json['mail_address'], json['password'])
     if res == users.SUCCESS:
-        user = User(request.form['mail_address'], request.form['password'])
+        user = User(json['mail_address'], json['password'])
         login_user(user)
         return make_secure_token(session['user_id'])
     return str(0)
@@ -51,12 +51,12 @@ def logout():
 @app.route('/books', methods = ['POST'])
 def regist():
     check_auth(request)
-    print request.values
-    data = { 'user_id'      : request.form['user_id'],
-             'image_data'    : request.form['image_data'],
-             'name'         : request.form['name'],
-             'price'        : request.form['price'],
-             'purchase_date': request.form['purchase_date']}
+    print request.json
+    data = { 'user_id'      : request.json['user_id'],
+             'image_data'    : request.json['image_data'],
+             'name'         : request.json['name'],
+             'price'        : request.json['price'],
+             'purchase_date': request.json['purchase_date']}
     res = book.register(db, data)
     return str(res)
 
@@ -64,10 +64,10 @@ def regist():
 def update(id):
     check_auth(request)
     print request.values
-    data = { 'image_data': request.form['image_data'],
-             'name': request.form['name'],
-             'price': request.form['price'],
-             'purchase_date': request.form['purchase_date']}
+    data = { 'image_data': request.json['image_data'],
+             'name': request.json['name'],
+             'price': request.json['price'],
+             'purchase_date': request.json['purchase_date']}
     res = book.update(db, id, data)
     return str(res)
 
