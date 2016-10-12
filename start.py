@@ -25,8 +25,11 @@ def hello():
 def register():
     print request.values
     res = users.register(db, request.form['mail_address'], request.form['password'])
-    print res
-    return str(res)
+    if res:
+        user = User(res['mail_address'], res['password'])
+        login_user(user)
+        print session['user_id']
+    return make_secure_token(session['user_id'])
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -105,7 +108,6 @@ def check_auth(request):
     if header_token != token:
         abort(401)
     return True
-
 
 if __name__ == '__main__':
     app.run(debug=True)
