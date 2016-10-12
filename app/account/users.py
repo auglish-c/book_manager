@@ -2,6 +2,13 @@ import MySQLdb
 from itsdangerous import (TimedJSONWebSignatureSerializer 
         as Serializer, BadSignature, SignatureExpired)
 
+BAD_REQUEST = 0
+REGISTERING = 1
+REGISTERED = 2
+
+FAILED = 0
+SUCCESS = 1
+
 def connect_db():
     connect = MySQLdb.connect(host   = 'localhost',
                               db     = 'bookmanager',
@@ -13,10 +20,10 @@ def connect_db():
 def register(db, mail, pswd):
     if mail is '' or pswd is '':
         print 'bad request'
-        return 0
+        return BAD_REQUEST
     if getUserByMailAddress(db, mail) is not None:
         print 'registered'
-        return 2
+        return REGISTERED
 
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from users')
@@ -32,15 +39,15 @@ def register(db, mail, pswd):
            )values(%d, "%s", "%s")' % (new_id, mail, pswd)
     cursor.execute(sql)
     db.commit()
-    return 1
+    return REGISTERING
 
 def login(db, mail, pswd):
     ps = getUserByMailAddress(db, mail)
     print ps
     if ps is not None and ps['password'] == pswd:
-        return ps
+        return SUCCESS
     else:
-        return 0
+        return FAILED
 
 def getUserByMailAddress(db, mail):
     cur = db.cursor(MySQLdb.cursors.DictCursor)

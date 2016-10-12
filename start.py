@@ -21,38 +21,34 @@ login_manager.login_view = "login"
 def hello():
     return "hello world"
 
-@app.route('/account/register', methods = ['POST'])
+@app.route('/signup', methods = ['POST'])
 def register():
     print request.values
     res = users.register(db, request.form['mail_address'], request.form['password'])
-    if res:
+    if res == users.REGISTERING:
         user = User(res['mail_address'], res['password'])
         login_user(user)
         print session['user_id']
-    return make_secure_token(session['user_id'])
+        return make_secure_token(session['user_id'])
+    return str(res)
 
-@login_manager.user_loader
-def load_user(user_id):
-    print user_id
-    return User.get(user_id)
-
-@app.route('/account/login', methods = ['POST'])
+@app.route('/login', methods = ['POST'])
 def login():
     print request.values
     res = users.login(db, request.form['mail_address'], request.form['password'])
-    if res:
-        user = User(res['mail_address'], res['password'])
+    if res == users.SUCCESS:
+        user = User(request.form['mail_address'], request.form['password'])
         login_user(user)
-        print session['user_id']
-    return make_secure_token(session['user_id'])
+        return make_secure_token(session['user_id'])
+    return str(0)
 
-@app.route("/account/logout")
+@app.route("/logout")
 @login_required
 def logout():
     check_auth(request)
     return str(logout_user())
 
-@app.route('/book/regist', methods = ['POST'])
+@app.route('/books', methods = ['POST'])
 def regist():
     check_auth(request)
     print request.values
@@ -64,18 +60,18 @@ def regist():
     res = book.register(db, data)
     return str(res)
 
-@app.route('/book/update', methods = ['POST'])
-def update():
+@app.route('/books/<id>', methods = ['POST'])
+def update(id):
     check_auth(request)
     print request.values
     data = { 'image_data': request.form['image_data'],
              'name': request.form['name'],
              'price': request.form['price'],
              'purchase_date': request.form['purchase_date']}
-    res = book.update(db, request.form['id'], data)
+    res = book.update(db, id, data)
     return str(res)
 
-@app.route('/book/get', methods = ['GET'])
+@app.route('/books', methods = ['GET'])
 def get():
     check_auth(request)
     print request.values
@@ -89,20 +85,24 @@ class User(UserMixin):
         self.password = passwd
 
 @login_manager.user_loader
-def user_loader(header_val):
-    user = User(header_val, header_val)
-    api_key = request.args.get('Authorization')
+def user_loader(req):
+    print "user"
+    user = User(req, req)
     return user
 
 @login_manager.request_loader
 def request_loader(request):
-    api_key = request.args.get('Authorization')
     print "request"
-    print api_key
     user = User(request.form['mail_address'], request.form['password'])
     return user
 
 def check_auth(request):
+    print request.headers
+    if 'Authorization' not in request.headers:
+        abort(401)
+    if 'user_id' not in session:
+        abort(401)
+
     header_token = request.headers['Authorization']
     token = make_secure_token(session['user_id'])
     if header_token != token:
