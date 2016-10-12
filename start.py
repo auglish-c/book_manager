@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, abort
 from app.account import users
 from app.book import book
 from flask.ext.login import LoginManager, UserMixin, login_required,\
@@ -30,6 +30,7 @@ def register():
 
 @login_manager.user_loader
 def load_user(user_id):
+    print user_id
     return User.get(user_id)
 
 @app.route('/account/login', methods = ['POST'])
@@ -40,18 +41,17 @@ def login():
         user = User(res['mail_address'], res['password'])
         login_user(user)
         print session['user_id']
-    return base64.b64decode(make_secure_token())
+    return make_secure_token(session['user_id'])
 
 @app.route("/account/logout")
 @login_required
 def logout():
-    try:
-        return str(logout_user())
-    except ValueError:
-        return "False"
+    check_auth(request)
+    return str(logout_user())
 
 @app.route('/book/regist', methods = ['POST'])
 def regist():
+    check_auth(request)
     print request.values
     data = { 'user_id'      : request.form['user_id'],
              'image_data'    : request.form['image_data'],
@@ -63,6 +63,7 @@ def regist():
 
 @app.route('/book/update', methods = ['POST'])
 def update():
+    check_auth(request)
     print request.values
     data = { 'image_data': request.form['image_data'],
              'name': request.form['name'],
@@ -73,6 +74,7 @@ def update():
 
 @app.route('/book/get', methods = ['GET'])
 def get():
+    check_auth(request)
     print request.values
     res = book.get(db, request.args.get('page'), request.args.get('user_id'))
     return jsonify(result=res)
@@ -84,14 +86,26 @@ class User(UserMixin):
         self.password = passwd
 
 @login_manager.user_loader
-def user_loader(email):
-    user = User(email, email)
+def user_loader(header_val):
+    user = User(header_val, header_val)
+    api_key = request.args.get('Authorization')
     return user
 
 @login_manager.request_loader
 def request_loader(request):
+    api_key = request.args.get('Authorization')
+    print "request"
+    print api_key
     user = User(request.form['mail_address'], request.form['password'])
     return user
+
+def check_auth(request):
+    header_token = request.headers['Authorization']
+    token = make_secure_token(session['user_id'])
+    if header_token != token:
+        abort(401)
+    return True
+
 
 if __name__ == '__main__':
     app.run(debug=True)
