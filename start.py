@@ -24,11 +24,11 @@ def hello():
 @app.route('/signup', methods = ['POST'])
 def register():
     print request.values
-    mail_address = request.json['mail_address']
+    email = request.json['email']
     passwd = request.json['password']
-    res = users.register(db, request.json['mail_address'], request.json['password'])
+    res = users.register(db, request.json['email'], request.json['password'])
     if res == users.REGISTERING:
-        user = User(mail_address, passwd)
+        user = User(email, passwd)
         login_user(user)
         print session['user_id']
         return jsonify(request_token=make_secure_token(session['user_id']))
@@ -37,9 +37,9 @@ def register():
 @app.route('/login', methods = ['POST'])
 def login():
     json = request.json
-    res = users.login(db, json['mail_address'], json['password'])
+    res = users.login(db, json['email'], json['password'])
     if res == users.SUCCESS:
-        user = User(json['mail_address'], json['password'])
+        user = User(json['email'], json['password'])
         login_user(user)
         return jsonify(request_token=make_secure_token(session['user_id']))
     return jsonify(error=0)
@@ -95,7 +95,7 @@ def user_loader(req):
 @login_manager.request_loader
 def request_loader(request):
     print "request"
-    user = User(request.form['mail_address'], request.form['password'])
+    user = User(request.form['email'], request.form['password'])
     return user
 
 def check_auth(request):
