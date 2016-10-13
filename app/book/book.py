@@ -17,32 +17,27 @@ def connect_db():
 
 def register(db, data):
     print(sys.stdout.encoding)
-    cursor = db.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('select count("id") from books')
-    id_count = cursor.fetchone()
-    if id_count['count("id")'] == 0l:
-        new_id = 0
-    else:
-        new_id = int(id_count['count("id")'])
     today = date.today()
 
     image_url = ''
     if data['image_data'] != '':
         image_url = image_upload(data['image_data'])
 
+    cursor = db.cursor(MySQLdb.cursors.DictCursor)
     sql = 'insert into books(\
-              id,\
               user_id,\
               name,\
               price,\
               purchase_date,\
               image_url\
-           )values(%d, "%s", "%s", "%s", "%s", "%s")'\
-           % (new_id, data['user_id'], data['name'], data['price'],
+           )values("%s", "%s", "%s", "%s", "%s")'\
+           % (data['user_id'], data['name'], data['price'],
               data['purchase_date'], image_url)
     cursor.execute(sql)
     db.commit()
-    return new_id
+    cursor.execute('select count("id") from books')
+    id_count = cursor.fetchone()
+    return id_count['count("id")']
 
 def update(db, book_id, data):
     image_url = ""

@@ -27,7 +27,7 @@ def register():
     email = request.json['email']
     passwd = request.json['password']
     res = users.register(db, request.json['email'], request.json['password'])
-    if res == users.REGISTERING:
+    if res > 0:
         user = User(email, passwd)
         login_user(user)
         print session['user_id']

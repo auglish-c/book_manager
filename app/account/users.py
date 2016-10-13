@@ -3,8 +3,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
         as Serializer, BadSignature, SignatureExpired)
 
 BAD_REQUEST = 0
-REGISTERING = 1
-REGISTERED = 2
+REGISTERED = -1
 
 FAILED = 0
 SUCCESS = 1
@@ -25,21 +24,16 @@ def register(db, mail, pswd):
         print 'registered'
         return REGISTERED
 
+    sql = 'insert into users(\
+              mail_address,\
+              password\
+           )values("%s", "%s")' % (mail, pswd)
+    cursor.execute(sql)
+    db.commit()
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from users')
     id_count = cursor.fetchone()
-    if id_count['count("id")'] == 0L:
-        new_id = 0
-    else:
-        new_id = int(id_count['count("id")'])
-    sql = 'insert into users(\
-              user_id,\
-              mail_address,\
-              password\
-           )values(%d, "%s", "%s")' % (new_id, mail, pswd)
-    cursor.execute(sql)
-    db.commit()
-    return REGISTERING
+    return id_count['count("id")']
 
 def login(db, mail, pswd):
     ps = getUserByMailAddress(db, mail)
