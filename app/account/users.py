@@ -24,13 +24,13 @@ def register(db, mail, pswd):
         print 'registered'
         return REGISTERED
 
+    cursor = db.cursor(MySQLdb.cursors.DictCursor)
     sql = 'insert into users(\
               mail_address,\
               password\
            )values("%s", "%s")' % (mail, pswd)
     cursor.execute(sql)
     db.commit()
-    cursor = db.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('select count("id") from users')
     id_count = cursor.fetchone()
     return id_count['count("id")']
@@ -39,7 +39,7 @@ def login(db, mail, pswd):
     ps = getUserByMailAddress(db, mail)
     print ps
     if ps is not None and ps['password'] == pswd:
-        return SUCCESS
+        return ps['user_id']
     else:
         return FAILED
 
