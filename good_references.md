@@ -11,7 +11,7 @@
 
 をすべて一通り目を通すべき
 
-#must
+# must
 - 失敗の本質
 - リーダブルコード
 - オブジェクト指向でなぜつくるのか
@@ -22,7 +22,7 @@
 - スクラムチームで始めるアジャイル開発 SCRAM BOOTCAMP
 - 安全なwebアプリケーションの作り方
 
-#設計思想
+# 設計思想
 - 新装版 リファクタリング
 - Java リファクタリング入門
 - オブジェクト指向分析設計
@@ -30,14 +30,16 @@
 - デザインパターン入門
 - Android開発の教科書
 
-#バイブル
+# バイブル
 - コンピュータネットワーク
 - サイ本
 
 
-#雑誌
+# 雑誌
+
 ◯がついているものは優先度高め
-##WEB +DB PRESS
+
+## WEB +DB PRESS
 - vol.74 : 良い設計の基礎知識
 - vol.80 : web技術入門○、 エンジニアの学び方○
 - vol.82 : WebAPIデザインの鉄則
@@ -51,15 +53,13 @@
 - 2016 6 : 今すぐ実践できる良いプログラムの書き方
 - 2013 06 : ちゃんとオブジェクト指向できていますか?
 
-#HP
+# HP
 - [プログラマが知るべき97のこと](http://プログラマが知るべき97のこと.com)
-- [sicp](http://sicp.iijlab.net/fulltext/xcont.html#cont)
 - [TECHSCORE](http://www.techscore.com/tech/DesignPattern/index.html/)
 - [Railsチュートリアル](http://railstutorial.jp)
 - [Coding conventions](https://en.wikipedia.org/wiki/Coding_conventions)
-- [thinking in java](http://www.mindview.net/Books/TIJ/)
 
-#記事
+# 記事
 - [新人エンジニアサバイバルガイド](http://qiita.com/jacksuzuki/items/b2fa6b44962e73a53d08)
 - [git commit するまえに考えるべき10のこと](https://hiroki.jp/2012/09/05/5523/)
 - [初心者エンジニアにお勧めしたい「進捗どうなった？」と言われないための仕事の進め方](http://qiita.com/soyanchu/items/d1cb9785fc211941a009)
@@ -68,7 +68,7 @@
 - [知っておくて便利なプログラミング原則一覧](http://d.hatena.ne.jp/asakichy/20100203/1265158263)
 
 
-#スライド
+# スライド
 - [良いWEB API設計の実践](http://slides.com/kbigwheel/web-api-design-good-practice/fullscreen#/)
 - [初学者に嬉しいAndroid開発環境](http://www.slideshare.net/hiroyukikusu/droidkaigi2015androidmvc)
 - [naoyaさんスライド](https://speakerdeck.com/naoya/webpuroguramatoshu-xue-falsejie-dian-sofalseru-riko)
