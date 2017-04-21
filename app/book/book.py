@@ -11,12 +11,14 @@ def connect_db():
     connect = MySQLdb.connect(host = 'localhost',
                               db = 'bookmanager',
                               user = 'root',
-                              passwd = 'caraquri')
+                              passwd = 'caraquri',
+                              charset = 'utf8')
     connect.cursortall = MySQLdb.cursors.DictCursor
     return connect
 
 def register(db, data):
     print(sys.stdout.encoding)
+    db.set_character_set('utf8')
     today = date.today()
 
     image_url = ''
