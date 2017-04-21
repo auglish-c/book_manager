@@ -1,4 +1,12 @@
 import MySQLdb
+from itsdangerous import (TimedJSONWebSignatureSerializer 
+        as Serializer, BadSignature, SignatureExpired)
+
+BAD_REQUEST = 0
+REGISTERED = -1
+
+FAILED = 0
+SUCCESS = 1
 
 def connect_db():
     connect = MySQLdb.connect(host   = 'localhost',
@@ -9,30 +17,36 @@ def connect_db():
     return connect
 
 def register(db, mail, pswd):
+    if mail is '' or pswd is '':
+        print 'bad request'
+        return BAD_REQUEST
+    if getUserByMailAddress(db, mail) is not None:
+        print 'registered'
+        return REGISTERED
+
     cursor = db.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('select count("id") from users')
-    id_count = cursor.fetchone()
-    if id_count['count("id")'] == 0L:
-        new_id = 0
-    else:
-        new_id = int(id_count['count("id")'])
     sql = 'insert into users(\
-              user_id,\
               mail_address,\
               password\
-           )values(%d, "%s", "%s")' % (new_id, mail, pswd)
+           )values("%s", "%s")' % (mail, pswd)
     cursor.execute(sql)
     db.commit()
-    return 1
+    cursor.execute('select count("id") from users')
+    id_count = cursor.fetchone()
+    return id_count['count("id")']
 
 def login(db, mail, pswd):
+    ps = getUserByMailAddress(db, mail)
+    print ps
+    if ps is not None and ps['password'] == pswd:
+        return ps['user_id']
+    else:
+        return FAILED
+
+def getUserByMailAddress(db, mail):
     cur = db.cursor(MySQLdb.cursors.DictCursor)
-    sql = 'select password from users \
+    sql = 'select * from users \
            where mail_address = "%s"'\
            % mail
     cur.execute(sql)
-    ps = cur.fetchone()
-    if ps['password'] == pswd:
-        return 1
-    else:
-        return 0
+    return cur.fetchone()
