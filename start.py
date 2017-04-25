@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, session, abort
+from flask import Flask, jsonify, request, session, abort, Response
 from app.account import users
 from app.book import book
 from flask.ext.login import LoginManager, UserMixin, login_required,\
@@ -27,11 +27,14 @@ def register():
     email = request.json['email']
     passwd = request.json['password']
     res = users.register(db, request.json['email'], request.json['password'])
+    print "RES"
+    print res
     if res > 0:
         user = User(email, passwd)
         login_user(user)
-        print session['user_id']
-        return jsonify(request_token=make_secure_token(session['user_id']),
+        user_token=make_secure_token(session['_id'])
+        print session
+        return jsonify(request_token=user_token,
                        user_id=res)
     return error_response(400)
 
@@ -40,12 +43,19 @@ def login():
     json = request.json
     print json
     res = users.login(db, json['email'], json['password'])
-    if res == users.SUCCESS:
-        user = User(json['email'], json['password'])
-        login_user(user)
-        return jsonify(request_token=make_secure_token(session['user_id']),
-                       user_id=res)
-    return error_response(400)
+    print res
+    
+    if res == users.FAILED:
+        response = jsonify(error_message="ERROR : no user")
+        response.status_code = 400
+        return response
+    user = User(json['email'], json['password'])
+    login_user(user)
+    user_token =  make_secure_token(session['_id'])
+    print "SESSION"
+    print session
+    return jsonify(request_token=user_token,
+                   user_id=res)
 
 @app.route("/logout")
 @login_required
@@ -65,6 +75,8 @@ def regist():
              'price'        : request.json['price'],
              'purchase_date': request.json['purchase_date']}
     res = book.register(db, data)
+    print "RES : "
+    print  res
     return jsonify(book_id=res)
 
 @app.route('/books/<id>', methods = ['PATCH'])
@@ -106,15 +118,20 @@ def request_loader(request):
     return user
 
 def check_auth(request):
+    print "REQUEST HEADER"
     print request.headers
+    print "SESSION"
     print session
     if 'Authorization' not in request.headers:
+        print 'nothing auth'
         return False
-    if 'user_id' not in session:
+    if '_id' not in session:
+        print 'without _id'
         return False
 
     header_token = request.headers['Authorization']
-    token = make_secure_token(session['user_id'])
+    token = make_secure_token(session['_id'])
+    print 'TOKEN'
     print token
     if header_token != token:
         return False
