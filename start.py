@@ -60,14 +60,10 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    if check_auth(request) != True:
-        return error_response(401)
     return jsonify(is_success=logout_user())
 
 @app.route('/books', methods = ['POST'])
 def regist():
-    if check_auth(request) != True:
-        return error_response(401)
     print request.json
     data = { 'user_id'      : request.json['user_id'],
              'image_data'    : request.json['image_data'],
@@ -81,8 +77,6 @@ def regist():
 
 @app.route('/books/<id>', methods = ['PATCH'])
 def update(id):
-    if check_auth(request) != True:
-        return error_response(401)
     print request.values
     data = { 'image_data': request.json['image_data'],
              'name': request.json['name'],
@@ -93,8 +87,6 @@ def update(id):
 
 @app.route('/books', methods = ['GET'])
 def get():
-    if check_auth(request) != True:
-        return error_response(401)
     print request.values
     res = book.get(db, request.args.get('page'), request.args.get('user_id'))
     return jsonify(result=res)
