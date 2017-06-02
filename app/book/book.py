@@ -56,7 +56,7 @@ def update(db, book_id, data):
            image_url, book_id)
     cur.execute(sql)
     db.commit()
-    return int(book_id)
+    return book_id
 
 def get(db, page, user_id):
     cur = db.cursor(MySQLdb.cursors.DictCursor)
